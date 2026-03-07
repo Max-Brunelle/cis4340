@@ -5,13 +5,22 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
 public class R15_SEC01_J {
+    private String cleanFilenameAndPath(String filename) {
+        if (filename.matches("[A-Za-z0-9._-]+")) {
+            return filename;
+        }
+        throw new IllegalArgumentException("Invalid filename");
+    }
+
     private void privilegedMethod(final String filename) throws FileNotFoundException {
+        final String cleanFilename = cleanFilenameAndPath(filename);
+
         try {
             FileInputStream fis =
                 (FileInputStream) AccessController.doPrivileged(
                     new PrivilegedExceptionAction<Object>() {
                         public FileInputStream run() throws FileNotFoundException {
-                            return new FileInputStream(filename);
+                            return new FileInputStream(cleanFilename);
                         }
                     }
                 );
